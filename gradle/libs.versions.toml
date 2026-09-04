@@ -8,7 +8,7 @@ adventure-minimessage-legacy = "4.1.0-SNAPSHOT"
 caffeine = "3.2.4"
 shadow = "9.6.1"
 
-junit = "5.11.4"
+junit = "6.1.3"
 junit-platform = "6.1.3"
 
 [libraries]
