@@ -1,0 +1,30 @@
+[versions]
+paper-legacy = "1.16.5-R0.1-SNAPSHOT"
+paper-native = "1.19.4-R0.1-SNAPSHOT"
+
+adventure-minimessage = "4.10.0"
+adventure-minimessage-legacy = "4.1.0-SNAPSHOT"
+
+caffeine = "3.2.4"
+shadow = "9.6.1"
+
+junit = "5.11.4"
+junit-platform = "1.11.4"
+
+[libraries]
+paper-legacy = { module = "com.destroystokyo.paper:paper-api", version.ref = "paper-legacy" }
+paper-native = { module = "io.papermc.paper:paper-api", version.ref = "paper-native" }
+
+adventure-text-minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure-minimessage" }
+adventure-text-minimessage-legacy = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure-minimessage-legacy" }
+adventure-text-legacy = { module = "net.kyori:adventure-text-serializer-legacy", version.ref = "adventure-minimessage" }
+adventure-text-plain = { module = "net.kyori:adventure-text-serializer-plain", version.ref = "adventure-minimessage" }
+
+caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version.ref = "caffeine" }
+
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }
+
+[plugins]
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
