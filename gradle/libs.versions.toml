@@ -9,7 +9,7 @@ caffeine = "3.2.4"
 shadow = "9.6.1"
 
 junit = "6.1.3"
-junit-platform = "1.11.4"
+junit-platform = "6.1.3"
 
 [libraries]
 paper-legacy = { module = "com.destroystokyo.paper:paper-api", version.ref = "paper-legacy" }
