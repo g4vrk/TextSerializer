@@ -1,6 +1,6 @@
 [versions]
 paper-legacy = "1.16.5-R0.1-SNAPSHOT"
-paper-native = "1.19.4-R0.1-SNAPSHOT"
+paper-native = "26.2.build.123-stable"
 
 adventure-minimessage = "4.10.0"
 adventure-minimessage-legacy = "4.1.0-SNAPSHOT"
