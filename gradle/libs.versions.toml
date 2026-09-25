@@ -5,7 +5,7 @@ paper-native = "1.19.4-R0.1-SNAPSHOT"
 adventure-minimessage = "4.10.0"
 adventure-minimessage-legacy = "4.1.0-SNAPSHOT"
 
-caffeine = "3.2.4"
+caffeine = "3.3.0"
 shadow = "9.6.1"
 
 junit = "6.1.3"
