@@ -84,6 +84,26 @@ class UniversalTextSerializerTest {
     }
 
     @Test
+    void resolvesTagsThroughAMapper() {
+        final String resolved = PLAIN.serialize(SERIALIZER.serialize(
+                "&cHello <player> <red>there</red>",
+                new com.g4vrk.text.TagMapper() {
+                    @Override
+                    public String map(final String name, final String args) {
+                        return "player".equals(name) ? "world" : null;
+                    }
+
+                    @Override
+                    public boolean has(final String name) {
+                        return "player".equals(name);
+                    }
+                }
+        ));
+
+        assertEquals("Hello world there", resolved);
+    }
+
+    @Test
     void usesCanonicalEmptyComponent() {
         assertEquals(Component.empty(), SERIALIZER.serialize(""));
     }

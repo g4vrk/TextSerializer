@@ -3,10 +3,15 @@ package com.g4vrk.text.serializer.impl.string;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.g4vrk.text.MiniMessageAdapter;
+import com.g4vrk.text.TagMapper;
 import com.g4vrk.text.serializer.impl.String2ComponentSerializer;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.Context;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -50,6 +55,61 @@ public final class MiniMessageTextSerializer implements String2ComponentSerializ
         }
 
         return this.parse(source, resolvers);
+    }
+
+    @Override
+    public @NotNull Component serialize(final @NotNull String source, final @NotNull TagMapper mapper) {
+        return this.parse(source, resolverOf(mapper));
+    }
+
+    /**
+     * Builds the tag resolver that asks a mapper for every tag it owns.
+     *
+     * @param mapper the mapper
+     * @return a resolver over the mapper
+     */
+    public static @NotNull TagResolver resolverOf(final @NotNull TagMapper mapper) {
+        return new TagResolver() {
+
+            @Override
+            public @Nullable Tag resolve(
+                    final @NotNull String name,
+                    final @NotNull ArgumentQueue arguments,
+                    final @NotNull Context context
+            ) {
+                final String value = mapper.map(name, join(arguments));
+
+                return value == null ? null : Tag.preProcessParsed(value);
+            }
+
+            @Override
+            public boolean has(final @NotNull String name) {
+                return mapper.has(name);
+            }
+
+        };
+    }
+
+    private static @NotNull String join(final @NotNull ArgumentQueue arguments) {
+        if (!arguments.hasNext()) {
+            return "";
+        }
+
+        String joined = arguments.pop().value();
+
+        if (!arguments.hasNext()) {
+            return joined;
+        }
+
+        final StringBuilder builder = new StringBuilder(joined).append(':');
+
+        do {
+            builder.append(arguments.pop().value()).append(':');
+        } while (arguments.hasNext());
+
+        builder.setLength(builder.length() - 1);
+
+        return builder.toString();
     }
 
     /**

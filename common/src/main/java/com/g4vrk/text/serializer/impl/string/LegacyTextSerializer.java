@@ -2,6 +2,7 @@ package com.g4vrk.text.serializer.impl.string;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.g4vrk.text.TagMapper;
 import com.g4vrk.text.serializer.impl.String2ComponentSerializer;
 import com.g4vrk.text.util.Legacy2MiniMessage;
 import net.kyori.adventure.text.Component;
@@ -54,6 +55,14 @@ public final class LegacyTextSerializer implements String2ComponentSerializer {
         }
 
         return this.miniMessage.parse(Legacy2MiniMessage.toMarkup(source), resolvers);
+    }
+
+    @Override
+    public @NotNull Component serialize(final @NotNull String source, final @NotNull TagMapper mapper) {
+        return this.miniMessage.parse(
+                Legacy2MiniMessage.toMarkup(source),
+                MiniMessageTextSerializer.resolverOf(mapper)
+        );
     }
 
     private static @NotNull Component serializeUncached(final @NotNull String source) {
