@@ -12,15 +12,4 @@ dependencies {
 
 }
 
-tasks {
-
-    shadowJar {
-
-        relocate(
-            "net.kyori.adventure.text.minimessage",
-            "com.g4vrk.text.shaded.adventure.minimessage"
-        )
-
-    }
-
-}
+// MiniMessage is part of the public TagResolver API and must retain its canonical package.

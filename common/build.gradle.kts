@@ -1,9 +1,8 @@
 dependencies {
 
-    compileOnly(libs.paper.legacy)
-    compileOnly(libs.adventure.text.minimessage.legacy) {
-        isTransitive = false
-    }
+    compileOnly("org.jetbrains:annotations:26.0.2")
+    compileOnly(libs.adventure.text.legacy)
+    compileOnly(libs.adventure.text.minimessage)
 
     implementation(libs.caffeine)
 

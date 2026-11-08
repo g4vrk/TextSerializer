@@ -67,6 +67,11 @@ public final class Legacy2MiniMessage {
         }
     }
 
+    /** Converts codes without parsing tags, preserving custom resolvers and escaped text. */
+    public static @NotNull String markup(final @NotNull String source) {
+        return convertCodes(Objects.requireNonNull(source, "source")).markup();
+    }
+
     private static Conversion convertCodes(final String source) {
         final StringBuilder output = new StringBuilder(source.length() + 32);
         final LegacyState state = new LegacyState();
@@ -124,7 +129,7 @@ public final class Legacy2MiniMessage {
                 continue;
             }
 
-            if (code == 'r' && hasFormattingTarget(source, index + 2)) {
+            if (code == 'r') {
                 state.close(output, true);
                 output.append("<reset>");
                 changed = true;

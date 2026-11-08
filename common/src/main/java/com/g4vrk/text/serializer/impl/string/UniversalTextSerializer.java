@@ -44,6 +44,13 @@ public final class UniversalTextSerializer implements String2ComponentSerializer
     }
 
     @Override
+    public @NotNull Component serialize(final @NotNull String source,
+            final net.kyori.adventure.text.minimessage.tag.resolver.TagResolver... resolvers) {
+        if (resolvers.length == 0) return serialize(source);
+        return miniMessageSerializer.serialize(Legacy2MiniMessage.markup(source), resolvers);
+    }
+
+    @Override
     public @NotNull Component serialize(
             final @NotNull String source
     ) {
@@ -79,7 +86,7 @@ public final class UniversalTextSerializer implements String2ComponentSerializer
 
             if (legacy) {
                 return miniMessageSerializer.serialize(
-                        Legacy2MiniMessage.convert(source)
+                        Legacy2MiniMessage.markup(source)
                 );
             }
 

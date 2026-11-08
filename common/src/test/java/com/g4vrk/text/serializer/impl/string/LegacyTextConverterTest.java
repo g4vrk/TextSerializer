@@ -13,7 +13,7 @@ class LegacyTextConverterTest {
 
     @ParameterizedTest
     @CsvSource(delimiter = '|', value = {
-            "&aGreen|§aGreen",
+            "&r|§r", "text&r|text§r", "&aGreen|§aGreen",
             "&AGreen|§aGreen",
             "§CBold case|§cBold case",
             "&#12abEFhex|§x§1§2§A§B§E§Fhex",
@@ -27,7 +27,7 @@ class LegacyTextConverterTest {
     @ParameterizedTest
     @ValueSource(strings = {
             "R&D", "A & B", "&&", "&zunknown", "trailing&", "&#12zzzz",
-            "&c&l", "§C§L", "&#12abEF&l", "&X&1&2&A&B&E&F&r"
+            "&c&l", "§C§L", "&#12abEF&l"
     })
     void preservesNonFormattingAmpersands(final String input) {
         assertEquals(input, CONVERTER.serialize(input));

@@ -248,7 +248,7 @@ public final class LegacyTextConverter implements String2StringSerializer {
 
             if (
                     isLegacyCode(code) &&
-                    hasFormattingTarget(source, i + 2)
+                    (toLowerCase(code) == 'r' || hasFormattingTarget(source, i + 2))
             ) {
 
                 final char normalizedCode =
@@ -319,7 +319,7 @@ public final class LegacyTextConverter implements String2StringSerializer {
                     c == SECTION_CHAR
             ) {
                 if (
-                        i + 2 < length &&
+                        i + 1 < length &&
                         isLegacyCode(source.charAt(i + 1))
                 ) {
                     return i;
