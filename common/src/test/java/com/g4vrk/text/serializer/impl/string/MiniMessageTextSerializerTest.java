@@ -12,7 +12,7 @@ class MiniMessageTextSerializerTest {
     @Test
     void bypassesDelegateWhenNoCompleteTagCanExist() {
         final AtomicInteger calls = new AtomicInteger();
-        final MiniMessageTextSerializer serializer = new MiniMessageTextSerializer(input -> {
+        final MiniMessageTextSerializer serializer = new MiniMessageTextSerializer((input, resolvers) -> {
             calls.incrementAndGet();
             return Component.text("parsed");
         });
@@ -25,7 +25,7 @@ class MiniMessageTextSerializerTest {
     @Test
     void cachesParsedInputWithinOneInstance() {
         final AtomicInteger calls = new AtomicInteger();
-        final MiniMessageTextSerializer serializer = new MiniMessageTextSerializer(input -> {
+        final MiniMessageTextSerializer serializer = new MiniMessageTextSerializer((input, resolvers) -> {
             calls.incrementAndGet();
             return Component.text("parsed");
         });

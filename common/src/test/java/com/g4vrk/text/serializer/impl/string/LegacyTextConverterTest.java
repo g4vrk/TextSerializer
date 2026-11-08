@@ -26,11 +26,18 @@ class LegacyTextConverterTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "R&D", "A & B", "&&", "&zunknown", "trailing&", "&#12zzzz",
-            "&c&l", "§C§L", "&#12abEF&l", "&X&1&2&A&B&E&F&r"
+            "A & B", "&&", "&zunknown", "trailing&", "&#12zzzz", "&x&1&2&3"
     })
     void preservesNonFormattingAmpersands(final String input) {
         assertEquals(input, CONVERTER.serialize(input));
+    }
+
+    @Test
+    void normalizesCodesAtTheEndOfTheText() {
+        assertEquals("§r", CONVERTER.serialize("&r"));
+        assertEquals("§cHello§r", CONVERTER.serialize("&cHello&r"));
+        assertEquals("§c§l", CONVERTER.serialize("&c&l"));
+        assertEquals("§x§1§2§A§B§E§F§r", CONVERTER.serialize("&X&1&2&A&B&E&F&r"));
     }
 
     @Test

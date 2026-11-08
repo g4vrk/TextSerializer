@@ -5,14 +5,14 @@ import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 
 /** Serializer entry point for legacy Paper servers. */
 @SuppressWarnings("deprecation")
-public final class LegacySerializers extends BaseSerializers {
+public final class LegacySerializerRegistry extends BaseSerializerRegistry {
 
     private static final MiniMessage MINI_MESSAGE = MiniMessage.builder().build();
     private static final PlainComponentSerializer PLAIN_TEXT = PlainComponentSerializer.plain();
 
-    public static final Serializers INSTANCE = new LegacySerializers();
+    public static final SerializerRegistry INSTANCE = new LegacySerializerRegistry();
 
-    private LegacySerializers() {
+    private LegacySerializerRegistry() {
         super(MINI_MESSAGE::deserialize, PLAIN_TEXT::serialize);
     }
 }

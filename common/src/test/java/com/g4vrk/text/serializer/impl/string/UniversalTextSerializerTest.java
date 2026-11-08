@@ -2,6 +2,8 @@ package com.g4vrk.text.serializer.impl.string;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.junit.jupiter.api.Test;
@@ -14,10 +16,10 @@ class UniversalTextSerializerTest {
 
     private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
     private static final PlainTextComponentSerializer PLAIN = PlainTextComponentSerializer.plainText();
-    private static final UniversalTextSerializer SERIALIZER = new UniversalTextSerializer(
-            new MiniMessageTextSerializer(MINI_MESSAGE::deserialize),
-            new LegacyTextSerializer()
-    );
+    private static final MiniMessageTextSerializer MINI_MESSAGE_SERIALIZER =
+            new MiniMessageTextSerializer(MINI_MESSAGE::deserialize);
+    private static final UniversalTextSerializer SERIALIZER =
+            new UniversalTextSerializer(MINI_MESSAGE_SERIALIZER);
 
     @Test
     void preservesLiteralAmpersandsInMiniMessage() {
@@ -42,10 +44,43 @@ class UniversalTextSerializerTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "plain text", "R&D", "1 < 2 & 3 > 0", "Привет, мир!", "emoji 😀"
+            "plain text", "1 < 2 & 3 > 0", "Привет, мир!", "emoji 😀"
     })
     void preservesPlainText(final String input) {
         assertEquals(input, PLAIN.serialize(SERIALIZER.serialize(input)));
+    }
+
+    @Test
+    void resolvesTagsOfMiniMessageInput() {
+        assertEquals(
+                "Hello world",
+                PLAIN.serialize(SERIALIZER.serialize(
+                        "<red>Hello <player></red>",
+                        TagResolver.resolver("player", Tag.preProcessParsed("world"))
+                ))
+        );
+    }
+
+    @Test
+    void resolvesTagsOfLegacyInput() {
+        assertEquals(
+                "Hello world",
+                PLAIN.serialize(SERIALIZER.serialize(
+                        "&cHello <player>",
+                        TagResolver.resolver("player", Tag.preProcessParsed("world"))
+                ))
+        );
+    }
+
+    @Test
+    void appliesAResetBeforeAResolvedTag() {
+        assertEquals(
+                "Hello world",
+                PLAIN.serialize(SERIALIZER.serialize(
+                        "&cHello&r <player>",
+                        TagResolver.resolver("player", Tag.preProcessParsed("world"))
+                ))
+        );
     }
 
     @Test

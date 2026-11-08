@@ -11,13 +11,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class LegacyTextSerializerTest {
 
-    private static final LegacyTextSerializer SERIALIZER = new LegacyTextSerializer();
+    private static final LegacyTextSerializer SERIALIZER = new LegacyTextSerializer(
+            new MiniMessageTextSerializer(net.kyori.adventure.text.minimessage.MiniMessage.miniMessage()::deserialize)
+    );
     private static final PlainTextComponentSerializer PLAIN = PlainTextComponentSerializer.plainText();
 
     @ParameterizedTest
-    @ValueSource(strings = {"R&D", "A & B", "&&", "&zunknown", "trailing&"})
+    @ValueSource(strings = {"A & B", "&&", "&zunknown", "trailing&"})
     void preservesLiteralAmpersands(final String input) {
         assertEquals(input, PLAIN.serialize(SERIALIZER.serialize(input)));
+    }
+
+    @Test
+    void appliesAResetAtTheEndOfTheText() {
+        assertEquals("", PLAIN.serialize(SERIALIZER.serialize("&r")));
+        assertEquals("Hello", PLAIN.serialize(SERIALIZER.serialize("&cHello&r")));
     }
 
     @Test

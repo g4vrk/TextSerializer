@@ -49,12 +49,18 @@ class Legacy2MiniMessageTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "R&D", "A & B", "&&", "&zunknown", "trailing&",
-            "&#12zzzz", "&x&1&2&3", "&c&l", "§C§L",
-            "section §Z stays"
+            "A & B", "&&", "&zunknown", "trailing&",
+            "&#12zzzz", "&x&1&2&3", "section §Z stays"
     })
     void preservesUnknownAndMalformedSequences(final String input) {
         assertEquals(input, Legacy2MiniMessage.convert(input));
+    }
+
+    @Test
+    void convertsCodesAtTheEndOfTheText() {
+        assertEquals("<reset>", Legacy2MiniMessage.convert("&r"));
+        assertEquals("<red>Hello</red><reset>", Legacy2MiniMessage.convert("&cHello&r"));
+        assertEquals("<red><bold></bold></red><reset>", Legacy2MiniMessage.convert("&c&l&r"));
     }
 
     @ParameterizedTest

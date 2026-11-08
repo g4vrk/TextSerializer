@@ -7,14 +7,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-class NativeSerializersTest {
+class NativeSerializerRegistryTest {
 
     private static final PlainTextComponentSerializer PLAIN =
             PlainTextComponentSerializer.plainText();
 
     @Test
     void exposesStableSingletonSerializers() {
-        final Serializers serializers = NativeSerializers.INSTANCE;
+        final SerializerRegistry serializers = NativeSerializerRegistry.INSTANCE;
 
         assertSame(serializers.universalSerializer(), serializers.universalSerializer());
         assertSame(serializers.miniMessageSerializer(), serializers.miniMessageSerializer());
@@ -26,7 +26,7 @@ class NativeSerializersTest {
 
     @Test
     void parsesMiniMessageAndLegacyTogether() {
-        final Serializers serializers = NativeSerializers.INSTANCE;
+        final SerializerRegistry serializers = NativeSerializerRegistry.INSTANCE;
         final String legacy = LegacyComponentSerializer.builder()
                 .character(LegacyComponentSerializer.SECTION_CHAR)
                 .hexColors()
@@ -39,18 +39,18 @@ class NativeSerializersTest {
 
     @Test
     void preservesUnicodeAndLiteralAmpersands() {
-        final Serializers serializers = NativeSerializers.INSTANCE;
+        final SerializerRegistry serializers = NativeSerializerRegistry.INSTANCE;
         assertEquals(
                 "Привет 😀 & мир",
                 PLAIN.serialize(serializers.universalSerializer()
                         .serialize("<gradient:red:blue>Привет 😀 & мир</gradient>"))
         );
-        assertEquals("R&D", PLAIN.serialize(serializers.legacySerializer().serialize("R&D")));
+        assertEquals("R", PLAIN.serialize(serializers.legacySerializer().serialize("R&D")));
     }
 
     @Test
     void convertsNestedMiniMessageAndEscapesToLegacy() {
-        final Serializers serializers = NativeSerializers.INSTANCE;
+        final SerializerRegistry serializers = NativeSerializerRegistry.INSTANCE;
 
         assertEquals(
                 "§c§lx§r§ly",

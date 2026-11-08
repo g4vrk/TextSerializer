@@ -60,17 +60,37 @@ public final class Legacy2MiniMessage {
             return source;
         }
 
-        try {
-            return MINI_MESSAGE.serialize(MINI_MESSAGE.deserialize(conversion.markup()));
-        } catch (final RuntimeException ignored) {
-            return conversion.markup();
+        if (!conversion.markup()) {
+            return conversion.markupText();
         }
+
+        try {
+            return MINI_MESSAGE.serialize(MINI_MESSAGE.deserialize(conversion.markupText()));
+        } catch (final RuntimeException ignored) {
+            return conversion.markupText();
+        }
+    }
+
+    /**
+     * Converts the legacy codes of a text and leaves everything else, including MiniMessage
+     * markup the caller still has to resolve, exactly as it is.
+     *
+     * @param source legacy, MiniMessage or mixed text
+     * @return markup with the legacy codes replaced by tags
+     */
+    public static @NotNull String toMarkup(final @NotNull String source) {
+        Objects.requireNonNull(source, "source");
+
+        final Conversion conversion = convertCodes(source);
+
+        return conversion.changed() ? conversion.markupText() : source;
     }
 
     private static Conversion convertCodes(final String source) {
         final StringBuilder output = new StringBuilder(source.length() + 32);
         final LegacyState state = new LegacyState();
         boolean changed = false;
+        boolean markup = false;
         int index = 0;
         int rawDepth = 0;
 
@@ -80,6 +100,7 @@ public final class Legacy2MiniMessage {
             if (current == '<' && !isEscaped(source, index)) {
                 final int tagEnd = findTagEnd(source, index + 1);
                 if (tagEnd != -1) {
+                    markup = true;
                     final String tag = source.substring(index, tagEnd + 1);
                     if (isResetTag(tag)) {
                         state.close(output, true);
@@ -110,21 +131,21 @@ public final class Legacy2MiniMessage {
             final char rawCode = source.charAt(index + 1);
             final char code = Character.toLowerCase(rawCode);
 
-            if (COLORS.containsKey(code) && hasFormattingTarget(source, index + 2)) {
+            if (COLORS.containsKey(code)) {
                 state.replaceColor(output, COLORS.get(code), rawDepth);
                 changed = true;
                 index += 2;
                 continue;
             }
 
-            if (DECORATIONS.containsKey(code) && hasFormattingTarget(source, index + 2)) {
+            if (DECORATIONS.containsKey(code)) {
                 state.addDecoration(output, code, DECORATIONS.get(code), rawDepth);
                 changed = true;
                 index += 2;
                 continue;
             }
 
-            if (code == 'r' && hasFormattingTarget(source, index + 2)) {
+            if (code == 'r') {
                 state.close(output, true);
                 output.append("<reset>");
                 changed = true;
@@ -132,8 +153,7 @@ public final class Legacy2MiniMessage {
                 continue;
             }
 
-            if (code == '#' && isHex(source, index + 2)
-                    && hasFormattingTarget(source, index + 8)) {
+            if (code == '#' && isHex(source, index + 2)) {
                 state.replaceColor(
                         output,
                         "#" + source.substring(index + 2, index + 8),
@@ -146,8 +166,7 @@ public final class Legacy2MiniMessage {
 
             if (code == 'x') {
                 final RepeatedHex repeated = repeatedHex(source, index);
-                if (repeated.complete()
-                        && hasFormattingTarget(source, repeated.endIndex())) {
+                if (repeated.complete()) {
                     state.replaceColor(output, "#" + repeated.color(), rawDepth);
                     changed = true;
                     index = repeated.endIndex();
@@ -164,40 +183,7 @@ public final class Legacy2MiniMessage {
         }
 
         state.close(output, true);
-        return new Conversion(output.toString(), changed);
-    }
-
-    private static boolean hasFormattingTarget(final String source, final int offset) {
-        int index = offset;
-        while (index < source.length()) {
-            final int tokenEnd = legacyTokenEnd(source, index);
-            if (tokenEnd == -1) {
-                return true;
-            }
-            index = tokenEnd;
-        }
-        return false;
-    }
-
-    private static int legacyTokenEnd(final String source, final int offset) {
-        if (offset + 1 >= source.length() || !isMarker(source.charAt(offset))) {
-            return -1;
-        }
-
-        final char code = Character.toLowerCase(source.charAt(offset + 1));
-        if (COLORS.containsKey(code) || DECORATIONS.containsKey(code) || code == 'r') {
-            return offset + 2;
-        }
-        if (code == '#' && isHex(source, offset + 2)) {
-            return offset + 8;
-        }
-        if (code == 'x') {
-            final RepeatedHex repeated = repeatedHex(source, offset);
-            if (repeated.complete()) {
-                return repeated.endIndex();
-            }
-        }
-        return -1;
+        return new Conversion(output.toString(), changed, markup);
     }
 
     private static boolean isMarker(final char value) {
@@ -291,7 +277,7 @@ public final class Legacy2MiniMessage {
                 || name.equalsIgnoreCase("r");
     }
 
-    private record Conversion(String markup, boolean changed) {
+    private record Conversion(String markupText, boolean changed, boolean markup) {
     }
 
     private record RepeatedHex(String color, int endIndex, boolean complete) {

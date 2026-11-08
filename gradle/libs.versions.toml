@@ -3,7 +3,7 @@ paper-legacy = "1.16.5-R0.1-SNAPSHOT"
 paper-native = "1.19.4-R0.1-SNAPSHOT"
 
 adventure-minimessage = "4.10.0"
-adventure-minimessage-legacy = "4.1.0-SNAPSHOT"
+adventure-minimessage-legacy = "4.10.0"
 
 caffeine = "3.2.4"
 shadow = "9.6.1"

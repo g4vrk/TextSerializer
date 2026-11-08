@@ -1,9 +1,7 @@
 dependencies {
 
     compileOnly(libs.paper.legacy)
-    compileOnly(libs.adventure.text.minimessage.legacy) {
-        isTransitive = false
-    }
+    compileOnly(libs.adventure.text.minimessage.legacy)
 
     implementation(libs.caffeine)
 

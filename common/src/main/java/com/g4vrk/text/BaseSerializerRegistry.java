@@ -15,18 +15,23 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 import java.util.function.Function;
 
-/** Shared, immutable serializer setup used by both distribution variants. */
-public abstract class BaseSerializers implements Serializers {
+/**
+ * Shared, immutable serializer setup used by both distribution variants.
+ *
+ * <p>One {@link MiniMessageTextSerializer} is created here and shared by the legacy and the
+ * universal serializer, so a text parsed by either of them fills a single cache.</p>
+ */
+public abstract class BaseSerializerRegistry implements SerializerRegistry {
 
     private final LegacyTextConverter legacyConverter = new LegacyTextConverter();
-    private final LegacyTextSerializer legacySerializer = new LegacyTextSerializer();
     private final MiniMessageTextConverter miniMessageConverter = new MiniMessageTextConverter();
     private final MiniMessageTextSerializer miniMessageSerializer;
+    private final LegacyTextSerializer legacySerializer;
     private final PlainTextSerializer plainSerializer;
     private final UniversalTextSerializer universalSerializer;
 
-    protected BaseSerializers(
-            final @NotNull Function<String, Component> miniMessage,
+    protected BaseSerializerRegistry(
+            final @NotNull MiniMessageAdapter miniMessage,
             final @NotNull Function<Component, String> plainText
     ) {
         this.miniMessageSerializer = new MiniMessageTextSerializer(
@@ -35,10 +40,8 @@ public abstract class BaseSerializers implements Serializers {
         this.plainSerializer = new PlainTextSerializer(
                 Objects.requireNonNull(plainText, "plainText")
         );
-        this.universalSerializer = new UniversalTextSerializer(
-                this.miniMessageSerializer,
-                this.legacySerializer
-        );
+        this.legacySerializer = new LegacyTextSerializer(this.miniMessageSerializer);
+        this.universalSerializer = new UniversalTextSerializer(this.miniMessageSerializer);
     }
 
     @Override
@@ -70,4 +73,5 @@ public abstract class BaseSerializers implements Serializers {
     public final @NotNull Component2StringSerializer plainSerializer() {
         return this.plainSerializer;
     }
+
 }

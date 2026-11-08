@@ -3,11 +3,23 @@ package com.g4vrk.text.serializer.impl.string;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.g4vrk.text.serializer.impl.String2ComponentSerializer;
+import com.g4vrk.text.util.Legacy2MiniMessage;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Parses legacy formatting: {@code §c}, {@code &c}, {@code &#rrggbb} and
+ * {@code &x&r&r&g&g&b&b}.
+ *
+ * <p>Without resolvers the text goes through Adventure's legacy serializer, which is the fastest
+ * path and resolves hex colours exactly like the server does. With resolvers the codes are turned
+ * into MiniMessage tags first, so a tag resolver works alongside them.</p>
+ */
 public final class LegacyTextSerializer implements String2ComponentSerializer {
+
+    private static final int CACHE_SIZE = 16_384;
 
     public static final LegacyComponentSerializer LEGACY_SERIALIZER =
             LegacyComponentSerializer.builder()
@@ -16,30 +28,35 @@ public final class LegacyTextSerializer implements String2ComponentSerializer {
                     .useUnusualXRepeatedCharacterHexFormat()
                     .build();
 
-    private static final int CACHE_SIZE = 16_384;
+    private final Cache<String, Component> cache = Caffeine.newBuilder()
+            .initialCapacity(4_096)
+            .maximumSize(CACHE_SIZE)
+            .build();
 
-    private static final Cache<String, Component> CACHE =
-            Caffeine.newBuilder()
-                    .initialCapacity(4_096)
-                    .maximumSize(CACHE_SIZE)
-                    .build();
+    private final MiniMessageTextSerializer miniMessage;
+
+    public LegacyTextSerializer(final @NotNull MiniMessageTextSerializer miniMessage) {
+        this.miniMessage = miniMessage;
+    }
+
+    @Override
+    public @NotNull Component serialize(final @NotNull String source) {
+        return this.cache.get(source, LegacyTextSerializer::serializeUncached);
+    }
 
     @Override
     public @NotNull Component serialize(
-            final @NotNull String source
+            final @NotNull String source,
+            final @NotNull TagResolver @NotNull ... resolvers
     ) {
+        if (resolvers.length == 0) {
+            return this.serialize(source);
+        }
 
-        return CACHE.get(
-                source,
-                LegacyTextSerializer::serializeUncached
-        );
-
+        return this.miniMessage.parse(Legacy2MiniMessage.toMarkup(source), resolvers);
     }
 
-    private static @NotNull Component serializeUncached(
-            @NotNull String source
-    ) {
-
+    private static @NotNull Component serializeUncached(final @NotNull String source) {
         final String normalized = LegacyTextConverter.normalizeLegacy(source);
 
         if (normalized.indexOf(LegacyComponentSerializer.SECTION_CHAR) == -1) {
@@ -47,7 +64,6 @@ public final class LegacyTextSerializer implements String2ComponentSerializer {
         }
 
         return LEGACY_SERIALIZER.deserialize(normalized);
-
     }
 
 }

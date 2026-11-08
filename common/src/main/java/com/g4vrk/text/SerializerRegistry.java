@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
  * Collection of serializers for MiniMessage, Minecraft legacy formatting,
  * and plain text.
  */
-public interface Serializers {
+public interface SerializerRegistry {
 
     /** Parses MiniMessage, legacy formatting, or a mixture of both. */
     @NotNull String2ComponentSerializer universalSerializer();

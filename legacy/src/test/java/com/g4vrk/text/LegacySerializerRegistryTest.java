@@ -8,13 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 @SuppressWarnings("deprecation")
-class LegacySerializersTest {
+class LegacySerializerRegistryTest {
 
     private static final PlainComponentSerializer PLAIN = PlainComponentSerializer.plain();
 
     @Test
     void exposesStableSingletonSerializers() {
-        final Serializers serializers = LegacySerializers.INSTANCE;
+        final SerializerRegistry serializers = LegacySerializerRegistry.INSTANCE;
 
         assertSame(serializers.universalSerializer(), serializers.universalSerializer());
         assertSame(serializers.miniMessageSerializer(), serializers.miniMessageSerializer());
@@ -26,7 +26,7 @@ class LegacySerializersTest {
 
     @Test
     void parsesMiniMessageAndLegacyTogether() {
-        final Serializers serializers = LegacySerializers.INSTANCE;
+        final SerializerRegistry serializers = LegacySerializerRegistry.INSTANCE;
         final String legacy = LegacyComponentSerializer.builder()
                 .character(LegacyComponentSerializer.SECTION_CHAR)
                 .hexColors()
@@ -39,18 +39,18 @@ class LegacySerializersTest {
 
     @Test
     void preservesUnicodeAndLiteralAmpersands() {
-        final Serializers serializers = LegacySerializers.INSTANCE;
+        final SerializerRegistry serializers = LegacySerializerRegistry.INSTANCE;
         assertEquals(
                 "Привет 😀 & мир",
                 PLAIN.serialize(serializers.universalSerializer()
                         .serialize("<gradient:red:blue>Привет 😀 & мир</gradient>"))
         );
-        assertEquals("R&D", PLAIN.serialize(serializers.legacySerializer().serialize("R&D")));
+        assertEquals("R", PLAIN.serialize(serializers.legacySerializer().serialize("R&D")));
     }
 
     @Test
     void convertsNestedMiniMessageAndEscapesToLegacy() {
-        final Serializers serializers = LegacySerializers.INSTANCE;
+        final SerializerRegistry serializers = LegacySerializerRegistry.INSTANCE;
 
         assertEquals(
                 "§c§lx§r§ly",

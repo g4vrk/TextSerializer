@@ -13,9 +13,9 @@ class SerializerCacheIsolationTest {
     @Test
     void miniMessageCacheBelongsToItsSerializerInstance() {
         final MiniMessageTextSerializer first =
-                new MiniMessageTextSerializer(ignored -> Component.text("first"));
+                new MiniMessageTextSerializer((ignored, resolvers) -> Component.text("first"));
         final MiniMessageTextSerializer second =
-                new MiniMessageTextSerializer(ignored -> Component.text("second"));
+                new MiniMessageTextSerializer((ignored, resolvers) -> Component.text("second"));
 
         first.serialize("<same>");
 
@@ -36,7 +36,7 @@ class SerializerCacheIsolationTest {
     @Test
     void cachesAreSafeUnderConcurrentUse() {
         final MiniMessageTextSerializer serializer =
-                new MiniMessageTextSerializer(Component::text);
+                new MiniMessageTextSerializer((input, resolvers) -> Component.text(input));
 
         IntStream.range(0, 2_000)
                 .parallel()

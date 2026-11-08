@@ -106,8 +106,7 @@ public final class LegacyTextConverter implements String2StringSerializer {
 
             if (
                     current == HEX_CHAR &&
-                    isHexColor(source, i + 1) &&
-                    hasFormattingTarget(source, i + 7)
+                    isHexColor(source, i + 1)
             ) {
 
                 if (builder == null) {
@@ -153,18 +152,6 @@ public final class LegacyTextConverter implements String2StringSerializer {
                             code == 'x' ||
                             code == 'X'
                     ) &&
-                    isRepeatedHex(source, i) &&
-                    !hasFormattingTarget(source, i + 14)
-            ) {
-                i += 13;
-                continue;
-            }
-
-            if (
-                    (
-                            code == 'x' ||
-                            code == 'X'
-                    ) &&
                     !isRepeatedHex(source, i)
             ) {
                 i = endOfPartialRepeatedHex(source, i, length) - 1;
@@ -173,8 +160,7 @@ public final class LegacyTextConverter implements String2StringSerializer {
 
             if (
                     code == HEX_CHAR &&
-                    isHexColor(source, i + 2) &&
-                    hasFormattingTarget(source, i + 8)
+                    isHexColor(source, i + 2)
             ) {
 
                 if (builder == null) {
@@ -206,8 +192,7 @@ public final class LegacyTextConverter implements String2StringSerializer {
                             code == 'x' ||
                             code == 'X'
                     ) &&
-                    isRepeatedHex(source, i) &&
-                    hasFormattingTarget(source, i + 14)
+                    isRepeatedHex(source, i)
             ) {
 
                 if (
@@ -246,10 +231,7 @@ public final class LegacyTextConverter implements String2StringSerializer {
                 continue;
             }
 
-            if (
-                    isLegacyCode(code) &&
-                    hasFormattingTarget(source, i + 2)
-            ) {
+            if (isLegacyCode(code)) {
 
                 final char normalizedCode =
                         toLowerCase(code);
@@ -319,14 +301,14 @@ public final class LegacyTextConverter implements String2StringSerializer {
                     c == SECTION_CHAR
             ) {
                 if (
-                        i + 2 < length &&
+                        i + 1 < length &&
                         isLegacyCode(source.charAt(i + 1))
                 ) {
                     return i;
                 }
 
                 if (
-                        i + 2 < length &&
+                        i + 1 < length &&
                         (
                                 source.charAt(i + 1) == 'x' ||
                                 source.charAt(i + 1) == 'X' ||
@@ -339,7 +321,7 @@ public final class LegacyTextConverter implements String2StringSerializer {
 
             if (
                     c == HEX_CHAR &&
-                    i + 7 < length &&
+                    i + 7 <= length &&
                     isHexColor(
                             source,
                             i + 1
@@ -376,57 +358,6 @@ public final class LegacyTextConverter implements String2StringSerializer {
         }
 
         return index;
-    }
-
-    private static boolean hasFormattingTarget(
-            @NotNull String source,
-            int offset
-    ) {
-        int index = offset;
-
-        while (index < source.length()) {
-            final int tokenEnd = legacyTokenEnd(source, index);
-            if (tokenEnd == -1) {
-                return true;
-            }
-            index = tokenEnd;
-        }
-
-        return false;
-    }
-
-    private static int legacyTokenEnd(
-            @NotNull String source,
-            int offset
-    ) {
-        if (offset >= source.length()) {
-            return -1;
-        }
-
-        if (source.charAt(offset) == HEX_CHAR && isHexColor(source, offset + 1)) {
-            return offset + 7;
-        }
-
-        final char marker = source.charAt(offset);
-        if (
-                (marker != AMPERSAND_CHAR && marker != SECTION_CHAR) ||
-                offset + 1 >= source.length()
-        ) {
-            return -1;
-        }
-
-        final char code = source.charAt(offset + 1);
-        if (isLegacyCode(code)) {
-            return offset + 2;
-        }
-        if (code == HEX_CHAR && isHexColor(source, offset + 2)) {
-            return offset + 8;
-        }
-        if ((code == 'x' || code == 'X') && isRepeatedHex(source, offset)) {
-            return offset + 14;
-        }
-
-        return -1;
     }
 
     private static void appendHex(
