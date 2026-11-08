@@ -18,6 +18,13 @@ class ResolverTest {
         assertEquals("<name>", plain(serializer.serialize("&c<name>&r")));
     }
 
+    @Test void usesExplicitCustomParserForResolverCalls() {
+        var mini = MiniMessage.builder().tags(net.kyori.adventure.text.minimessage.tag.resolver.TagResolver.empty()).build();
+        var custom = new MiniMessageTextSerializer(mini::deserialize, (source, resolvers) -> mini.deserialize(source, resolvers));
+        assertEquals("<red>Alice", plain(custom.serialize("<red><name>", Placeholder.unparsed("name", "Alice"))));
+        assertEquals("<red><name>", plain(custom.serialize("<red><name>")));
+    }
+
     @Test void resetDoesNotAppearAsText() {
         for (String input : new String[]{"&r", "§r", "&R"}) assertEquals("", plain(serializer.serialize(input)));
         assertEquals("text", plain(serializer.serialize("&ctext&r")));

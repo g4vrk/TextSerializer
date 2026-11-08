@@ -2,7 +2,7 @@ dependencies {
 
     compileOnly("org.jetbrains:annotations:26.0.2")
     compileOnly(libs.adventure.text.legacy)
-    compileOnly(libs.adventure.text.minimessage)
+    compileOnlyApi(libs.adventure.text.minimessage)
 
     implementation(libs.caffeine)
 

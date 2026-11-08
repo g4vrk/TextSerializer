@@ -18,5 +18,7 @@ Custom MiniMessage configurations can supply both parsing functions to
 MiniMessageTextSerializer. The one-function constructor uses the standard
 MiniMessage parser for resolver calls.
 
-Validation: common module tests pass. Full legacy/native builds remain blocked by
-Paper Maven access; cross-version server compatibility has not been verified.
+Validation: full Gradle build and all 158 tests pass under JDK 21, including the
+legacy and native modules. Live cross-version server compatibility has not been
+verified. The common module is exported as an API dependency; GROUP and VERSION
+publication overrides also govern project dependency coordinates.

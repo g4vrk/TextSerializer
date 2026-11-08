@@ -6,7 +6,7 @@ dependencies {
         exclude(group = "net.kyori", module = "adventure-api")
     }
 
-    implementation(project(":common"))
+    api(project(":common"))
 
     testImplementation(libs.paper.legacy)
 

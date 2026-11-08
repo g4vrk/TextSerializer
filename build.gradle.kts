@@ -7,10 +7,10 @@ plugins {
 }
 
 
-group = "com.g4vrk"
+group = System.getenv("GROUP") ?: "com.g4vrk"
 
 val baseVersion = "1.0.0"
-version = VersionUtility.version(project, baseVersion)
+version = System.getenv("VERSION") ?: VersionUtility.version(project, baseVersion)
 
 description = "Text serializing for Minecraft stuff (Adventure components)"
 
