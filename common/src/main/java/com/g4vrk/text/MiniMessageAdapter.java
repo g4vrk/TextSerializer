@@ -1,5 +1,6 @@
 package com.g4vrk.text;
 
+import com.g4vrk.text.serializer.impl.string.MiniMessageTextSerializer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.jetbrains.annotations.NotNull;
@@ -22,9 +23,18 @@ public interface MiniMessageAdapter {
      */
     @NotNull Component deserialize(final @NotNull String input, final @NotNull TagResolver @NotNull ... resolvers);
 
-    /** Parses tags through a string mapper without coupling it to the parser's component types. */
-    default @NotNull Component deserialize(final @NotNull String input, final @NotNull TagMapper mapper) {
-        return this.deserialize(input, com.g4vrk.text.serializer.impl.string.MiniMessageTextSerializer.resolverOf(mapper));
+    /**
+     * Resolves string tags using the selected parser, including isolated legacy parsers.
+     *
+     * @param input the markup
+     * @param mapper the tag values
+     * @return a component from the server Adventure API
+     */
+    default @NotNull Component deserialize(
+            final @NotNull String input,
+            final @NotNull TagMapper mapper
+    ) {
+        return this.deserialize(input, MiniMessageTextSerializer.resolverOf(mapper));
     }
 
 }

@@ -137,7 +137,6 @@ public final class MiniMessageTextSerializer implements String2ComponentSerializ
         }
     }
 
-    /** Parses mapped tags without caching values that depend on the caller. */
     public @NotNull Component parse(final @NotNull String source, final @NotNull TagMapper mapper) {
         if (source.indexOf(TAG_START) == -1 || source.indexOf(TAG_END) == -1) {
             return Component.text(source);

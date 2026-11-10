@@ -1,5 +1,6 @@
 package com.g4vrk.text.util;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
 
@@ -88,7 +89,7 @@ public final class Legacy2MiniMessage {
 
     private static boolean modernAdventure() {
         try {
-            net.kyori.adventure.text.Component.class.getMethod("compact");
+            Component.class.getMethod("compact");
             return true;
         } catch (final NoSuchMethodException absent) {
             return false;

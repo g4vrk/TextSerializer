@@ -31,7 +31,7 @@ public final class LegacySerializerRegistry extends BaseSerializerRegistry {
 
     private static MiniMessageAdapter parser() {
         try {
-            net.kyori.adventure.text.Component.class.getMethod("compact");
+            Component.class.getMethod("compact");
             return ModernParser.adapter();
         } catch (final NoSuchMethodException absent) {
             return new LegacyParser();
