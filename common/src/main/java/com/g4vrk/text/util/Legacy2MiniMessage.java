@@ -88,9 +88,9 @@ public final class Legacy2MiniMessage {
 
     private static boolean modernAdventure() {
         try {
-            Class.forName("net.kyori.adventure.text.format.TextDecorationAndState");
+            net.kyori.adventure.text.Component.class.getMethod("compact");
             return true;
-        } catch (final ClassNotFoundException absent) {
+        } catch (final NoSuchMethodException absent) {
             return false;
         }
     }
