@@ -12,6 +12,7 @@ junit = "6.1.3"
 junit-platform = "6.1.3"
 
 [libraries]
+adventure-text-gson = { module = "net.kyori:adventure-text-serializer-gson", version.ref = "adventure-minimessage" }
 paper-legacy = { module = "com.destroystokyo.paper:paper-api", version.ref = "paper-legacy" }
 paper-native = { module = "io.papermc.paper:paper-api", version.ref = "paper-native" }
 

@@ -59,7 +59,7 @@ public final class MiniMessageTextSerializer implements String2ComponentSerializ
 
     @Override
     public @NotNull Component serialize(final @NotNull String source, final @NotNull TagMapper mapper) {
-        return this.parse(source, resolverOf(mapper));
+        return this.parse(source, mapper);
     }
 
     /**
@@ -77,6 +77,9 @@ public final class MiniMessageTextSerializer implements String2ComponentSerializ
                     final @NotNull ArgumentQueue arguments,
                     final @NotNull Context context
             ) {
+                if (!mapper.has(name)) {
+                    return null;
+                }
                 final String value = mapper.map(name, join(arguments));
 
                 return value == null ? null : Tag.preProcessParsed(value);
@@ -129,6 +132,17 @@ public final class MiniMessageTextSerializer implements String2ComponentSerializ
 
         try {
             return this.miniMessage.deserialize(source, resolvers);
+        } catch (final RuntimeException ignored) {
+            return Component.text(source);
+        }
+    }
+
+    public @NotNull Component parse(final @NotNull String source, final @NotNull TagMapper mapper) {
+        if (source.indexOf(TAG_START) == -1 || source.indexOf(TAG_END) == -1) {
+            return Component.text(source);
+        }
+        try {
+            return this.miniMessage.deserialize(source, mapper);
         } catch (final RuntimeException ignored) {
             return Component.text(source);
         }
