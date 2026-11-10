@@ -22,4 +22,9 @@ public interface MiniMessageAdapter {
      */
     @NotNull Component deserialize(final @NotNull String input, final @NotNull TagResolver @NotNull ... resolvers);
 
+    /** Parses tags through a string mapper without coupling it to the parser's component types. */
+    default @NotNull Component deserialize(final @NotNull String input, final @NotNull TagMapper mapper) {
+        return this.deserialize(input, com.g4vrk.text.serializer.impl.string.MiniMessageTextSerializer.resolverOf(mapper));
+    }
+
 }

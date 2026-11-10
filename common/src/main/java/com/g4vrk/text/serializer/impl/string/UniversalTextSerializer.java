@@ -64,7 +64,7 @@ public final class UniversalTextSerializer implements String2ComponentSerializer
     public @NotNull Component serialize(final @NotNull String source, final @NotNull TagMapper mapper) {
         return this.miniMessage.parse(
                 Legacy2MiniMessage.toMarkup(source),
-                MiniMessageTextSerializer.resolverOf(mapper)
+                mapper
         );
     }
 
@@ -81,7 +81,7 @@ public final class UniversalTextSerializer implements String2ComponentSerializer
             return this.miniMessage.parse(source);
         }
 
-        return this.miniMessage.parse(Legacy2MiniMessage.convert(source));
+        return this.miniMessage.parse(Legacy2MiniMessage.toMarkup(source));
     }
 
 }

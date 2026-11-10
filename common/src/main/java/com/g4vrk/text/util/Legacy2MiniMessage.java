@@ -13,7 +13,7 @@ public final class Legacy2MiniMessage {
 
     private static final char AMPERSAND = '&';
     private static final char SECTION = '§';
-    private static final MiniMessage MINI_MESSAGE = MiniMessage.builder().build();
+    private static final boolean MODERN_ADVENTURE = modernAdventure();
 
     private static final Map<Character, String> COLORS = Map.ofEntries(
             Map.entry('0', "black"),
@@ -60,12 +60,12 @@ public final class Legacy2MiniMessage {
             return source;
         }
 
-        if (!conversion.markup()) {
+        if (!conversion.markup() || !MODERN_ADVENTURE) {
             return conversion.markupText();
         }
 
         try {
-            return MINI_MESSAGE.serialize(MINI_MESSAGE.deserialize(conversion.markupText()));
+            return Canonicalizer.MINI_MESSAGE.serialize(Canonicalizer.MINI_MESSAGE.deserialize(conversion.markupText()));
         } catch (final RuntimeException ignored) {
             return conversion.markupText();
         }
@@ -84,6 +84,21 @@ public final class Legacy2MiniMessage {
         final Conversion conversion = convertCodes(source);
 
         return conversion.changed() ? conversion.markupText() : source;
+    }
+
+    private static boolean modernAdventure() {
+        try {
+            Class.forName("net.kyori.adventure.text.format.TextDecorationAndState");
+            return true;
+        } catch (final ClassNotFoundException absent) {
+            return false;
+        }
+    }
+
+    private static final class Canonicalizer {
+
+        private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
+
     }
 
     private static Conversion convertCodes(final String source) {

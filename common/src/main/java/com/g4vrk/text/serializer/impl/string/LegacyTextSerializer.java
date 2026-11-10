@@ -61,7 +61,7 @@ public final class LegacyTextSerializer implements String2ComponentSerializer {
     public @NotNull Component serialize(final @NotNull String source, final @NotNull TagMapper mapper) {
         return this.miniMessage.parse(
                 Legacy2MiniMessage.toMarkup(source),
-                MiniMessageTextSerializer.resolverOf(mapper)
+                mapper
         );
     }
 

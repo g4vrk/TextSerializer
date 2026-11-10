@@ -7,6 +7,7 @@ dependencies {
     }
 
     implementation(project(":common"))
+    implementation(project(path = ":legacy-engine", configuration = "shadow"))
 
     testImplementation(libs.paper.legacy)
 
