@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /** Converts recognized Minecraft legacy codes to canonical MiniMessage markup. */
@@ -15,33 +14,6 @@ public final class Legacy2MiniMessage {
     private static final char AMPERSAND = '&';
     private static final char SECTION = '§';
     private static final boolean MODERN_ADVENTURE = modernAdventure();
-
-    private static final Map<Character, String> COLORS = Map.ofEntries(
-            Map.entry('0', "black"),
-            Map.entry('1', "dark_blue"),
-            Map.entry('2', "dark_green"),
-            Map.entry('3', "dark_aqua"),
-            Map.entry('4', "dark_red"),
-            Map.entry('5', "dark_purple"),
-            Map.entry('6', "gold"),
-            Map.entry('7', "gray"),
-            Map.entry('8', "dark_gray"),
-            Map.entry('9', "blue"),
-            Map.entry('a', "green"),
-            Map.entry('b', "aqua"),
-            Map.entry('c', "red"),
-            Map.entry('d', "light_purple"),
-            Map.entry('e', "yellow"),
-            Map.entry('f', "white")
-    );
-
-    private static final Map<Character, String> DECORATIONS = Map.of(
-            'k', "obfuscated",
-            'l', "bold",
-            'm', "strikethrough",
-            'n', "underlined",
-            'o', "italic"
-    );
 
     private Legacy2MiniMessage() {
     }
@@ -113,7 +85,7 @@ public final class Legacy2MiniMessage {
         while (index < source.length()) {
             final char current = source.charAt(index);
 
-            if (current == '<' && !isEscaped(source, index)) {
+            if (current == '<' && startsTag(source, index) && !isEscaped(source, index)) {
                 final int tagEnd = findTagEnd(source, index + 1);
                 if (tagEnd != -1) {
                     markup = true;
@@ -147,15 +119,19 @@ public final class Legacy2MiniMessage {
             final char rawCode = source.charAt(index + 1);
             final char code = Character.toLowerCase(rawCode);
 
-            if (COLORS.containsKey(code)) {
-                state.replaceColor(output, COLORS.get(code), rawDepth);
+            final String color = colorName(code);
+
+            if (color != null) {
+                state.replaceColor(output, color, rawDepth);
                 changed = true;
                 index += 2;
                 continue;
             }
 
-            if (DECORATIONS.containsKey(code)) {
-                state.addDecoration(output, code, DECORATIONS.get(code), rawDepth);
+            final String decoration = decorationName(code);
+
+            if (decoration != null) {
+                state.addDecoration(output, code, decoration, rawDepth);
                 changed = true;
                 index += 2;
                 continue;
@@ -202,6 +178,45 @@ public final class Legacy2MiniMessage {
         return new Conversion(output.toString(), changed, markup);
     }
 
+    private static String colorName(final char code) {
+        return switch (code) {
+            case '0' -> "black";
+            case '1' -> "dark_blue";
+            case '2' -> "dark_green";
+            case '3' -> "dark_aqua";
+            case '4' -> "dark_red";
+            case '5' -> "dark_purple";
+            case '6' -> "gold";
+            case '7' -> "gray";
+            case '8' -> "dark_gray";
+            case '9' -> "blue";
+            case 'a' -> "green";
+            case 'b' -> "aqua";
+            case 'c' -> "red";
+            case 'd' -> "light_purple";
+            case 'e' -> "yellow";
+            case 'f' -> "white";
+            default -> null;
+        };
+    }
+
+    private static String decorationName(final char code) {
+        return switch (code) {
+            case 'k' -> "obfuscated";
+            case 'l' -> "bold";
+            case 'm' -> "strikethrough";
+            case 'n' -> "underlined";
+            case 'o' -> "italic";
+            default -> null;
+        };
+    }
+
+    private static boolean isHexDigit(final char value) {
+        return (value >= '0' && value <= '9')
+                || (value >= 'a' && value <= 'f')
+                || (value >= 'A' && value <= 'F');
+    }
+
     private static boolean isMarker(final char value) {
         return value == AMPERSAND || value == SECTION;
     }
@@ -211,7 +226,7 @@ public final class Legacy2MiniMessage {
             return false;
         }
         for (int index = offset; index < offset + 6; index++) {
-            if (Character.digit(source.charAt(index), 16) == -1) {
+            if (!isHexDigit(source.charAt(index))) {
                 return false;
             }
         }
@@ -226,7 +241,7 @@ public final class Legacy2MiniMessage {
                 color.length() < 6 &&
                 index + 1 < source.length() &&
                 isMarker(source.charAt(index)) &&
-                Character.digit(source.charAt(index + 1), 16) != -1
+                isHexDigit(source.charAt(index + 1))
         ) {
             color.append(source.charAt(index + 1));
             index += 2;
@@ -265,6 +280,10 @@ public final class Legacy2MiniMessage {
         }
 
         return -1;
+    }
+
+    private static boolean startsTag(final String source, final int index) {
+        return index + 1 < source.length() && !Character.isWhitespace(source.charAt(index + 1));
     }
 
     private static boolean isEscaped(final String source, final int index) {

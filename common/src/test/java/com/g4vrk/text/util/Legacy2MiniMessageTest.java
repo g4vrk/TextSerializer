@@ -98,4 +98,17 @@ class Legacy2MiniMessageTest {
                         "§" + code + "value"
                 ));
     }
+
+    @Test
+    void nonAsciiDigitsAreNotHexColors() {
+        final String source = "&#１２３４５６ text";
+
+        assertEquals(source, Legacy2MiniMessage.convert(source));
+    }
+
+    @Test
+    void lessThanFollowedBySpaceIsPlainText() {
+        assertEquals("1 < 2 and 3 > 2 <red>x</red>", Legacy2MiniMessage.toMarkup("1 < 2 and 3 > 2 <red>x</red>"));
+        assertEquals("a < b <red>x</red>", Legacy2MiniMessage.toMarkup("a < b <red>x</red>"));
+    }
 }
