@@ -1,7 +1,7 @@
 package com.g4vrk.text.serializer.impl.string;
 
 import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
+import com.g4vrk.text.util.TextCache;
 import com.g4vrk.text.MiniMessageAdapter;
 import com.g4vrk.text.TagMapper;
 import com.g4vrk.text.serializer.impl.String2ComponentSerializer;
@@ -27,12 +27,8 @@ public final class MiniMessageTextSerializer implements String2ComponentSerializ
     private static final char TAG_START = '<';
     private static final char TAG_END = '>';
 
-    private static final int CACHE_SIZE = 16_384;
 
-    private final Cache<String, Component> cache = Caffeine.newBuilder()
-            .initialCapacity(4_096)
-            .maximumSize(CACHE_SIZE)
-            .build();
+    private final Cache<String, Component> cache = TextCache.create();
 
     private final MiniMessageAdapter miniMessage;
 
@@ -126,7 +122,7 @@ public final class MiniMessageTextSerializer implements String2ComponentSerializ
             final @NotNull String source,
             final @NotNull TagResolver @NotNull ... resolvers
     ) {
-        if (source.indexOf(TAG_START) == -1 || source.indexOf(TAG_END) == -1) {
+        if (!hasMarkup(source)) {
             return Component.text(source);
         }
 
@@ -137,15 +133,27 @@ public final class MiniMessageTextSerializer implements String2ComponentSerializ
         }
     }
 
+    /**
+     * Parses markup without asking the cache, resolving its tags through a mapper.
+     *
+     * @param source the markup
+     * @param mapper the tag mapper
+     * @return the component
+     */
     public @NotNull Component parse(final @NotNull String source, final @NotNull TagMapper mapper) {
-        if (source.indexOf(TAG_START) == -1 || source.indexOf(TAG_END) == -1) {
+        if (!hasMarkup(source)) {
             return Component.text(source);
         }
+
         try {
             return this.miniMessage.deserialize(source, mapper);
         } catch (final RuntimeException ignored) {
             return Component.text(source);
         }
+    }
+
+    private static boolean hasMarkup(final @NotNull String source) {
+        return source.indexOf(TAG_START) != -1 && source.indexOf(TAG_END) != -1;
     }
 
     private @NotNull Component serializeUncached(final @NotNull String source) {

@@ -1,7 +1,7 @@
 package com.g4vrk.text.serializer.impl.string;
 
 import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
+import com.g4vrk.text.util.TextCache;
 import com.g4vrk.text.serializer.impl.String2StringSerializer;
 import com.g4vrk.text.util.Legacy2MiniMessage;
 import org.jetbrains.annotations.NotNull;
@@ -11,13 +11,9 @@ import static net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializ
 
 public final class MiniMessageTextConverter implements String2StringSerializer {
 
-    private static final int CACHE_SIZE = 16_384;
 
     private static final Cache<String, String> CACHE =
-            Caffeine.newBuilder()
-                    .initialCapacity(4_096)
-                    .maximumSize(CACHE_SIZE)
-                    .build();
+            TextCache.create();
 
     @Override
     public @NotNull String serialize(

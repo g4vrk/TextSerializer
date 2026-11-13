@@ -1,7 +1,7 @@
 package com.g4vrk.text.serializer.impl.string;
 
 import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
+import com.g4vrk.text.util.TextCache;
 import com.g4vrk.text.TagMapper;
 import com.g4vrk.text.serializer.impl.String2ComponentSerializer;
 import com.g4vrk.text.util.Legacy2MiniMessage;
@@ -26,12 +26,8 @@ public final class UniversalTextSerializer implements String2ComponentSerializer
     private static final char TAG_START = '<';
     private static final char TAG_END = '>';
 
-    private static final int CACHE_SIZE = 16_384;
 
-    private final Cache<String, Component> cache = Caffeine.newBuilder()
-            .initialCapacity(4_096)
-            .maximumSize(CACHE_SIZE)
-            .build();
+    private final Cache<String, Component> cache = TextCache.create();
 
     private final MiniMessageTextSerializer miniMessage;
 
