@@ -10,6 +10,7 @@ dependencies {
     implementation(project(path = ":legacy-engine", configuration = "shadow"))
 
     testImplementation(libs.paper.legacy)
+    testImplementation(libs.adventure.text.minimessage.legacy)
 
 }
 
