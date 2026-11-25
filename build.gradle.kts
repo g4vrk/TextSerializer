@@ -9,7 +9,7 @@ plugins {
 
 group = "com.g4vrk"
 
-val baseVersion = "1.2.0"
+val baseVersion = "1.2.1"
 version = VersionUtility.version(project, baseVersion)
 
 description = "Text serializing for Minecraft stuff (Adventure components)"
