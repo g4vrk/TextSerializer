@@ -2,7 +2,7 @@ dependencies {
 
     compileOnly(libs.paper.legacy)
 
-    implementation(libs.adventure.text.minimessage.legacy) {
+    compileOnly(libs.adventure.text.minimessage.legacy) {
         exclude(group = "net.kyori", module = "adventure-api")
     }
 
